@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://camel.apache.org/schema/spring"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<beans:bean class="camel.timer.MyEventNotifier" />
+	<beans:bean class="camel.timer.BeanTimerException" id="beanTimerException"/>
+	
+	<beans:bean id="myDeadLetterErrorHandler" class="org.apache.camel.builder.DeadLetterChannelBuilder">
+    	<beans:property name="deadLetterUri" value="direct:deadLetter"/>
+	</beans:bean>
+
+	<camelContext id="camelContext" autoStartup="true" trace="true" errorHandlerRef="myDeadLetterErrorHandler">
+	 <route >
+	 	<from uri="timer:foo?delay=1&amp;period=1000&amp;repeatCount=5" />
+	 	<setBody>
+	 		<simple>Histoire de faire du contenu ...</simple> 
+	 	</setBody> 
+	 	<to uri="beanTimerException"/> 
+	 	<to uri="file:./src/camel/timer/out" />
+	 </route>
+	 <route>
+	 	<from uri="seda:sendErrorByMail"/>
+	 	<to uri="bean:debugProcessor"/>
+	 	<convertBodyTo type="java.lang.String"/>
+	 	<to uri="bean:debugProcessor"/>
+	 	<to uri="file:./src/camel/timer/email" />
+	 	
+	 </route>
+	</camelContext>
+</beans:beans>

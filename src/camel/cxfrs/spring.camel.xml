@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://camel.apache.org/schema/spring"
+	xmlns:cxf="http://camel.apache.org/schema/cxf"
+    xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+       http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<beans:bean id="myService" class="camel.cxfrs.MyServiceImpl"/>
+
+	<!-- 4 THE ACTUAL SERVER WHICH WILL GET HIT -->
+    <jaxrs:server id="restService" 
+            address="http://localhost:8090/rest" createdFromAPI="true" depends-on="camelContext" 
+            staticSubresourceResolution="true">
+            <jaxrs:serviceBeans>
+                    <ref>myService</ref>
+            </jaxrs:serviceBeans>
+    </jaxrs:server>
+
+
+
+    <!-- 3  YOUR PROXY CLIENT SERVER -->
+    <cxf:rsClient id="rsClient" address="http://localhost:8090/rest"  
+                              serviceClass="camel.cxfrs.MyServiceImpl" username="client" password="password"/>
+
+    <!-- 1 JAXRS PROXY CLIENT 
+    <jaxrs:client id="cityServiceClient" address="http://localhost:8123/rest"
+            serviceClass="camel.cxfrs.MyService" username="client" password="password"/>  -->  
+    
+
+   <!-- 2  YOUR LOCAL SERVER THAT YOU NEED TO HIT, YOUR LOCAL SERVER -->
+    <cxf:rsServer id="rsServer" address="http://localhost:8123/rest/" serviceClass="camel.cxfrs.MyServiceImpl" />
+    
+    <camelContext id="camelContext">
+    	<route>
+    	<!-- <from uri="cxfbean:cityServiceClient"/>
+    	<to uri="file:capital?fileName=test.xml"/> -->
+    	<from uri="cxfrs:bean:rsClient"/>
+    	<log message="JAX-RS OK" logName="org.apache.camel" />
+    	</route>
+    
+    
+    </camelContext>
+
+</beans:beans>

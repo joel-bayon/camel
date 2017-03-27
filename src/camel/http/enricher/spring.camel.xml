@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://camel.apache.org/schema/spring"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<camelContext >
+		<route>
+			<from uri="jetty:http://localhost:8080/newOrder" />
+			<pollEnrich timeout="100"   >
+				<simple>activemq:queue:${header.product}</simple>
+			</pollEnrich>
+			
+			<!-- for camel 2.15 and older ...
+			<choice>
+				<when>
+					<simple>${header.product} == 'widget'</simple>
+					<pollEnrich   ></pollEnrich>
+						<pollEnrich uri="activemq:queue:widget" timeout="100" />
+				</when>
+				<otherwise>
+					<pollEnrich uri="activemq:queue:gadget" timeout="100" />
+				</otherwise>
+			</choice> 
+			-->
+		</route>
+	</camelContext>
+
+</beans:beans>

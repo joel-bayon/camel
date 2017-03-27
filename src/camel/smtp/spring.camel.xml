@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://camel.apache.org/schema/spring"
+	xmlns:cxf="http://camel.apache.org/schema/cxf"
+    xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+       http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	
+    <camelContext id="camelContext">
+    	<route>
+    	  <from uri="jms://queue:subscription"/>
+    	  <setHeader headerName="to">
+    	  	<constant>davsclaus@apache.org ; jstrachan@apache.org ; ningjiang@apache.org</constant>
+    	  </setHeader>
+    	  <to uri="smtp://admin@mailserver.com?password=secret"/>
+    	</route>
+    </camelContext>
+    

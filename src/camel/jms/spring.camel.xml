@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	
+	<bean id="serviceImpl" class="camel.jms.MyServiceImpl"/>
+	
+	<bean id="amq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+	    <property name="connectionFactory">
+		    <bean class="org.apache.activemq.ActiveMQConnectionFactory">
+		      <property name="brokerURL" value="tcp://localhost:61616"/>
+		    </bean>
+  		</property>
+	</bean>
+
+	<camelContext xmlns="http://camel.apache.org/schema/spring">
+
+		<!-- this is the route that our proxy will routed when invoked and the 
+			output from this route is returned as reply on the proxy -->
+		<route>
+			<from uri="amq:queue:request.messages?disableTimeToLive=true" />
+			<to uri="bean:serviceImpl?method=run"/>
+			<!-- <to uri="jms:queue:reply.messages?disableTimeToLive=true"/> -->
+			<!-- <to uri="file:./camelMessages" ></to>  -->
+		</route>
+	</camelContext>
+
+</beans>

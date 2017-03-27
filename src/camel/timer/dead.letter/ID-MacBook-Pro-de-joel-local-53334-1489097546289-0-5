@@ -1,0 +1,1 @@
+org.apache.camel.NoSuchBeanException: No bean could be found in the registry for: debugProcessor

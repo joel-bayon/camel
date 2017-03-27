@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://camel.apache.org/schema/spring"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<beans:bean class="camel.file.MyEventNotifier" />
+
+	<camelContext id="camelContext" autoStartup="true" trace="true" >
+	 <route >
+	 	<from uri="file:./src/camel/file/in?noop=true" />
+	 	<convertBodyTo type="java.lang.String"></convertBodyTo>
+	 	<setHeader headerName="clientName">
+	 		<xpath resultType="java.lang.String">/client/nom</xpath>
+	 	</setHeader>
+	 	<setHeader headerName="CamelFileName">
+	 		<simple>${header.clientName}.xml</simple>
+	 	</setHeader>
+	 	<setBody>
+	 		<spel>#{request.body.replace(request.headers['clientName'],request.headers['clientName'].toUpperCase())}</spel> 
+	 	</setBody>  
+	 	<to uri="file:./src/camel/file/out" />
+	 </route>
+	</camelContext>
+</beans:beans>

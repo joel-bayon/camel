@@ -1,0 +1,1 @@
+org.apache.camel.RuntimeCamelException: org.apache.camel.component.bean.MethodNotFoundException: Method with name: Failure not found on bean: Exchange[ID-MacBook-Pro-de-joel-local-52335-1489095623494-0-12][Message: java.lang.RuntimeException: count == 3] of type: org.apache.camel.impl.DefaultExchange
